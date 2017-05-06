@@ -66,7 +66,7 @@ class Sender():
     def _send(self, subject, text):
         data = {"from": config.MAILGUN_EMAIL,
                 "to": config.EMAIL_ADDR,
-                #"cc": config.MAILGUN_CC_LIST,
+                "cc": config.MAILGUN_CC_LIST,
                 "subject": subject,
                 "text": text}
         logging.debug(f'Sending email {data} via {config.MAILGUN_API_HOST}')
