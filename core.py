@@ -208,8 +208,8 @@ class Agent(ZendeskAPIGenericClass):
     def get_talk_status(self):
         print(f'Agent: {self.agent_id} - Getting talk status: ', end='')
         avail = self.get_talk_availability()
-        if avail == 'on_call':
-            avail = 'available'
+        if avail['status'] == 'on_call':
+            avail['status'] = 'available'
         status = avail['status']
         print(status)
         return status
