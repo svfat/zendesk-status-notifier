@@ -94,7 +94,7 @@ class Sender():
         line_tpl = "<p>Id: {}, Name: {} TALK <strong>{}</strong> {}<p>"
         result = []
         for item in stack:
-            result.append(line_tpl.format(agent_id, agent_name, item['status'], item['dt']))
+            result.append(line_tpl.format(agent_id, agent_name, item['status'].upper(), item['dt']))
         return HTML_HEADER+'\n'.join(result)+HTML_FOOTER
 
     def _render_to_plaintext(self, agent_id, agent_name, stack):
@@ -121,7 +121,7 @@ class Sender():
         line_tpl = "Id: {}, Name: {} TALK {} {}"
         result = []
         for item in stack:
-            result.append(line_tpl.format(agent_id, agent_name, item['status'], item['dt']))
+            result.append(line_tpl.format(agent_id, agent_name, item['status'].upper(), item['dt']))
         return '\n'.join(result)
 
     def send_talk_status(self, agent_id, agent_name, stack):
