@@ -58,17 +58,19 @@ cred = {
 zc = Zenpy(**cred)
 
 
+
+
 class Sender():
     def __init__(self):
         pass
 
-
-    def _send(self, subject, text):
+    def _send(self, subject, text, html):
         data = {"from": config.MAILGUN_EMAIL,
                 "to": config.EMAIL_ADDR,
                 "cc": config.MAILGUN_CC_LIST,
                 "subject": subject,
-                "text": text}
+                "text": text,
+                "html": html}
         logging.debug(f'Sending email {data} via {config.MAILGUN_API_HOST}')
         response = requests.post(
             f'https://api.mailgun.net/v3/{config.MAILGUN_API_HOST}/messages',
@@ -79,7 +81,23 @@ class Sender():
         else:
             logging.error(f'Email with subject {subject} - Status {response.status_code}')
 
-    def _render_to_template(self, agent_id, agent_name, stack):
+    def _render_to_html(self, agent_id, agent_name, stack):
+        HTML_HEADER = """<!DOCTYPE html>
+                        <html>
+                        <body>\n
+                      """
+
+        HTML_FOOTER = """\n
+                        </body>
+                        </html>
+                      """
+        line_tpl = "<p>Id: {}, Name: {} TALK <strong>{}</strong> {}<p>"
+        result = []
+        for item in stack:
+            result.append(line_tpl.format(agent_id, agent_name, item['status'], item['dt']))
+        return HTML_HEADER+'\n'.join(result)+HTML_FOOTER
+
+    def _render_to_plaintext(self, agent_id, agent_name, stack):
         """
         TO: support@natomounts.com
         SUBJECT: ZD ACCOUNT NAME TOOL STATUS DATE TIME IN PDT
@@ -107,9 +125,10 @@ class Sender():
         return '\n'.join(result)
 
     def send_talk_status(self, agent_id, agent_name, stack):
-        text = self._render_to_template(agent_id, agent_name, stack)
+        plaintext = self._render_to_plaintext(agent_id, agent_name, stack)
+        html = self._render_to_html(agent_id, agent_name, stack)
         subject = f"ZD {agent_name} TALK STATUS REPORT"
-        self._send(subject, text)
+        self._send(subject, plaintext, html)
 
 
 default_sender = Sender()
