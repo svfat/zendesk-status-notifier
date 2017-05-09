@@ -157,7 +157,7 @@ class Storage():
         )
         stack = self.data[agent_id]['stack']
         if len(stack) >= size:
-            self.sender.send_talk_status(agent_id=agent_id, agent_name=agent.agent_name, stack=stack)
+            self.sender.send_talk_status(agent_id=agent_id, agent_name=agent.agent_name, stack=reversed(stack))
             if self.__save_history:
                 self.data[agent_id]['history'] += stack
             self.data[agent_id]['stack'] = []
