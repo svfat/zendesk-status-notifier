@@ -169,18 +169,19 @@ class Storage():
         return last_status
 
     def add_status(self, agent, status, size=12):
-        agent_id = agent.agent_id
-        self.data[agent_id]['stack'].append(
-            {'status': status,
-             'dt': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-        )
-        stack = self.data[agent_id]['stack']
-        if len(stack) >= size:
-            self.sender.send_talk_status(agent_id=agent_id, agent_name=agent.agent_name, stack=stack[::-1])
-            if self.__save_history:
-                self.data[agent_id]['history'] += stack
-            self.data[agent_id]['stack'] = []
-        self._dump()
+        if status.lower() in ['available', 'not_available']:
+            agent_id = agent.agent_id
+            self.data[agent_id]['stack'].append(
+                {'status': status,
+                 'dt': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+            )
+            stack = self.data[agent_id]['stack']
+            if len(stack) >= size:
+                self.sender.send_talk_status(agent_id=agent_id, agent_name=agent.agent_name, stack=stack[::-1])
+                if self.__save_history:
+                    self.data[agent_id]['history'] += stack
+                self.data[agent_id]['stack'] = []
+            self._dump()
 
 
 storage = Storage()
@@ -208,8 +209,6 @@ class Agent(ZendeskAPIGenericClass):
     def get_talk_status(self):
         print(f'Agent: {self.agent_id} - Getting talk status: ', end='')
         avail = self.get_talk_availability()
-        if avail['status'] == 'on_call':
-            avail['status'] = 'available'
         status = avail['status']
         print(status)
         return status
