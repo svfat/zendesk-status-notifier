@@ -176,8 +176,8 @@ class Storage():
                  'dt': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
             )
             stack = self.data[agent_id]['stack']
+            self.sender.send_talk_status(agent_id=agent_id, agent_name=agent.agent_name, stack=stack[::-1])
             if len(stack) >= size:
-                self.sender.send_talk_status(agent_id=agent_id, agent_name=agent.agent_name, stack=stack[::-1])
                 if self.__save_history:
                     self.data[agent_id]['history'] += stack
                 self.data[agent_id]['stack'] = []
