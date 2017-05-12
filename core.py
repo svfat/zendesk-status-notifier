@@ -58,8 +58,6 @@ cred = {
 zc = Zenpy(**cred)
 
 
-
-
 class Sender():
     def __init__(self):
         pass
@@ -84,18 +82,37 @@ class Sender():
     def _render_to_html(self, agent_id, agent_name, stack):
         HTML_HEADER = """<!DOCTYPE html>
                         <html>
-                        <body>\n
+                        <body>
+                        <table border="1">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>NAME</th>
+                                <th>SERVICE</th>
+                                <th>STATUS</th>
+                                <th>DATETIME</th>
+                            </tr>
+                            </thead>
                       """
 
-        HTML_FOOTER = """\n
+        HTML_FOOTER = """
+                        </table>
                         </body>
                         </html>
                       """
-        line_tpl = "<p>Id: {}, Name: {} TALK <strong>{}</strong> {}<p>"
+        line_tpl = """
+                    <tr>
+                        <td>{}</td>
+                        <td>{}</td>
+                        <td>TALK</td>
+                        <td><strong>{}</strong></td>
+                        <td>{}</td>
+                    </tr>
+                   """
         result = []
         for item in stack:
             result.append(line_tpl.format(agent_id, agent_name, item['status'].upper(), item['dt']))
-        return HTML_HEADER+'\n'.join(result)+HTML_FOOTER
+        return HTML_HEADER + '\n'.join(result) + HTML_FOOTER
 
     def _render_to_plaintext(self, agent_id, agent_name, stack):
         """

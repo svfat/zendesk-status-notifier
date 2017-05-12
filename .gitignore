@@ -91,3 +91,4 @@ ENV/
 config.py
 storage.json
 config.py
+tmp/
