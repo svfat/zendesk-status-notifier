@@ -18,6 +18,7 @@ except ImportError:
 from urllib.request import Request, urlopen
 from urllib.error import URLError
 
+DT_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 class WrongContentTypeException(BaseException):
     def __init__(self, message=None, errors=None):
@@ -116,7 +117,7 @@ class Sender():
         result = []
         for item in stack:
             status = item['status'].upper()
-            str_time = item['dt'].strftime("%Y-%m-%d %H:%M:%S")
+            str_time = item['dt']
             result.append(line_tpl.format(agent_id, agent_name, status, str_time))
         return HTML_HEADER + '\n'.join(result) + HTML_FOOTER.format(total_avail)
 
@@ -202,7 +203,7 @@ class Storage():
             agent_id = agent.agent_id
             self.data[agent_id]['stack'].append(
                 {'status': status,
-                 'dt': datetime.now()
+                 'dt': datetime.now().strftime(DT_FORMAT)
                  }
             )
             stack = self.data[agent_id]['stack']
