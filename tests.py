@@ -26,9 +26,12 @@ class BaseTest(unittest.TestCase):
             ("2017-07-24 16:00:00", NOT_AVAILABLE),
         ]
         f = "%Y-%m-%d %H:%M:%S"
-        data = [{'dt': datetime.strptime(t, f), 'status': s} for t, s in times[::-1]]
+        data = [{'dt': t, 'status': s} for t, s in times[::-1]]
         assert len(data) == len(times)
-        total = calculate_available_time(data=data, avail_status=AVAILABLE, not_avail_status=NOT_AVAILABLE)
+        total = calculate_available_time(data=data,
+                                         avail_status=AVAILABLE,
+                                         not_avail_status=NOT_AVAILABLE,
+                                         f=f)
         print(total)
         assert total == timedelta(hours=5)
 

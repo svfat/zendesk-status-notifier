@@ -154,7 +154,8 @@ class Sender():
         reversed_stack = stack[::-1]
         total_avail_time = calculate_available_time(data=stack,
                                                     avail_status='AVAILABLE',
-                                                    not_avail_status='NOT_AVAILABLE')
+                                                    not_avail_status='NOT_AVAILABLE',
+                                                    f=DT_FORMAT)
         plaintext = self._render_to_plaintext(agent_id, agent_name, reversed_stack, total_avail_time)
         html = self._render_to_html(agent_id, agent_name, reversed_stack, total_avail_time)
         subject = f"ZD {agent_name} TALK STATUS REPORT"
