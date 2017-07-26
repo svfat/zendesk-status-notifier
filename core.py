@@ -1,10 +1,13 @@
-import sys
 import json
-import requests
-from urllib import request
-from collections import defaultdict
 import logging
+import sys
+from collections import defaultdict
 from datetime import datetime
+from urllib import request
+
+import requests
+
+from utils import calculate_available_time
 
 logging.basicConfig(filename="main.log", level=logging.DEBUG)
 
@@ -79,7 +82,7 @@ class Sender():
         else:
             logging.error(f'Email with subject {subject} - Status {response.status_code}')
 
-    def _render_to_html(self, agent_id, agent_name, stack):
+    def _render_to_html(self, agent_id, agent_name, stack, total_avail):
         HTML_HEADER = """<!DOCTYPE html>
                         <html>
                         <body>
@@ -96,6 +99,7 @@ class Sender():
                       """
 
         HTML_FOOTER = """
+                        <p>Total available: {}</p>
                         </table>
                         </body>
                         </html>
@@ -111,10 +115,12 @@ class Sender():
                    """
         result = []
         for item in stack:
-            result.append(line_tpl.format(agent_id, agent_name, item['status'].upper(), item['dt']))
-        return HTML_HEADER + '\n'.join(result) + HTML_FOOTER
+            status = item['status'].upper()
+            str_time = item['dt'].strftime("%Y-%m-%d %H:%M:%S")
+            result.append(line_tpl.format(agent_id, agent_name, status, str_time))
+        return HTML_HEADER + '\n'.join(result) + HTML_FOOTER.format(total_avail)
 
-    def _render_to_plaintext(self, agent_id, agent_name, stack):
+    def _render_to_plaintext(self, agent_id, agent_name, stack, total_avail):
         """
         TO: support@natomounts.com
         SUBJECT: ZD ACCOUNT NAME TOOL STATUS DATE TIME IN PDT
@@ -139,11 +145,17 @@ class Sender():
         result = []
         for item in stack:
             result.append(line_tpl.format(agent_id, agent_name, item['status'].upper(), item['dt']))
+        result.append("Total available: {}".format(total_avail))
         return '\n'.join(result)
 
     def send_talk_status(self, agent_id, agent_name, stack):
-        plaintext = self._render_to_plaintext(agent_id, agent_name, stack)
-        html = self._render_to_html(agent_id, agent_name, stack)
+        # reverse stack
+        reversed_stack = stack[::-1]
+        total_avail_time = calculate_available_time(data=stack,
+                                                    avail_status='AVAILABLE',
+                                                    not_avail_status='NOT_AVAILABLE')
+        plaintext = self._render_to_plaintext(agent_id, agent_name, reversed_stack, total_avail_time)
+        html = self._render_to_html(agent_id, agent_name, reversed_stack, total_avail_time)
         subject = f"ZD {agent_name} TALK STATUS REPORT"
         self._send(subject, plaintext, html)
 
@@ -190,10 +202,11 @@ class Storage():
             agent_id = agent.agent_id
             self.data[agent_id]['stack'].append(
                 {'status': status,
-                 'dt': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+                 'dt': datetime.now()
+                 }
             )
             stack = self.data[agent_id]['stack']
-            self.sender.send_talk_status(agent_id=agent_id, agent_name=agent.agent_name, stack=stack[::-1])
+            self.sender.send_talk_status(agent_id=agent_id, agent_name=agent.agent_name, stack=stack)
             if len(stack) >= size:
                 if self.__save_history:
                     self.data[agent_id]['history'] += stack
