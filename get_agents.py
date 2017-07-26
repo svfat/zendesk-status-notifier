@@ -11,4 +11,3 @@ for user in zc.users():
     if role in include:
         print(user.id, user.name)
         users.append(user)
-
