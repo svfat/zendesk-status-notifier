@@ -153,8 +153,8 @@ class Sender():
         # reverse stack
         reversed_stack = stack[::-1]
         total_avail_time = calculate_available_time(data=stack,
-                                                    avail_status='AVAILABLE',
-                                                    not_avail_status='NOT_AVAILABLE',
+                                                    avail_status='available',
+                                                    not_avail_status='not_available',
                                                     f=DT_FORMAT)
         plaintext = self._render_to_plaintext(agent_id, agent_name, reversed_stack, total_avail_time)
         html = self._render_to_html(agent_id, agent_name, reversed_stack, total_avail_time)
