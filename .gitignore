@@ -92,3 +92,5 @@ config.py
 storage.json
 config.py
 tmp/
+
+database.sqlite

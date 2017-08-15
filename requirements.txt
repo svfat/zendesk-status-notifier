@@ -1,0 +1,9 @@
+appdirs==1.4.3
+cachetools==2.0.0
+packaging==16.8
+pony==0.7.2
+pyparsing==2.2.0
+python-dateutil==2.6.0
+requests==2.13.0
+six==1.10.0
+zenpy==1.1.12

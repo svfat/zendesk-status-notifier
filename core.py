@@ -4,6 +4,9 @@ import sys
 from collections import defaultdict
 from datetime import datetime
 from urllib import request
+from data import create_agents, add_record
+
+create_agents()
 
 try:
     import config
@@ -102,6 +105,7 @@ class Storage():
                  'dt': datetime.now().strftime(DT_FORMAT)
                  }
             )
+            add_record(status=status, agent_id=agent_id)
             self._dump()
 
 
