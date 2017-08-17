@@ -118,9 +118,12 @@ class Sender():
 
 if __name__ == "__main__":
     default_sender = Sender()
+    from data import get_records_on_dt_range
+    db_data = get_records_on_dt_range()
     for agent in agents:
         agent_id = agent.agent_id
-        stack = storage.data[agent_id]['stack']
+        #stack = storage.data[agent_id]['stack']
+        stack = db_data[agent_id]
         default_sender.send_talk_status(agent_id=agent_id, agent_name=agent.agent_name, stack=stack)
         storage.data[agent_id]['stack'] = []
     storage.dump()
