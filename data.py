@@ -46,7 +46,7 @@ def add_record(agent_id, status):
 def get_records_on_dt_range(start_dt=None, end_dt=None):
     if not start_dt:
         yesterday = datetime.now() - timedelta(days=1)
-        start_dt = yesterday.replace(hour=17)
+        start_dt = yesterday.replace(hour=0)
     if not end_dt:
         end_dt = start_dt + timedelta(days=1)
     data = Record.select(lambda x: x.created_at >= start_dt and x.created_at <= end_dt)\

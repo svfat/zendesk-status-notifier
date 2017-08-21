@@ -119,6 +119,7 @@ class Sender():
 if __name__ == "__main__":
     default_sender = Sender()
     from data import get_records_on_dt_range
+    from datetime import datetime
     db_data = get_records_on_dt_range()
     for agent in agents:
         agent_id = agent.agent_id
