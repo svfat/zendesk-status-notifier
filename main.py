@@ -1,18 +1,14 @@
 #!/usr/bin/env python
-import logging
+from core import agents
+from config import DEBUG_SEND_ALL
 
-logger = logging.getLogger(__name__)
-from core import agents, storage
-from config import DEBUG_SEND_ALL, STACK_SIZE
-
-logger.debug(f"DEBUG_SEND_ALL {DEBUG_SEND_ALL}, STACK_SIZE {STACK_SIZE}")
+print(f"DEBUG_SEND_ALL {DEBUG_SEND_ALL}")
 for agent in agents:
     current_status = agent.get_talk_status()
-    last_status = storage.get_last_status(agent=agent)
-
-    if DEBUG_SEND_ALL:
-        storage.add_status(agent=agent, status=current_status, size=STACK_SIZE)
-    elif current_status != last_status:
-        storage.add_status(agent=agent, status=current_status, size=STACK_SIZE)
-
+    last_status = agent.get_last_status()
+    print(f'agent: {agent.agent_name}, status: {current_status}, last status: {last_status}')
+    if current_status != last_status or DEBUG_SEND_ALL:
+        agent.save_current_status()
+    else:
+        print(f"Stasus doesn't changed")
 # print(agent.get_chat_availability())2

@@ -1,10 +1,8 @@
 import json
 import logging
 import sys
-from collections import defaultdict
-from datetime import datetime
 from urllib import request
-from data import create_agents, add_record
+from data import create_agents, add_record, get_agents
 
 create_agents()
 
@@ -59,59 +57,6 @@ cred = {
 zc = Zenpy(**cred)
 
 
-
-
-class Storage():
-    def __init__(self, filename="storage.json"):
-        self._filename = filename
-        self.__save_history = False
-        self.data = defaultdict(lambda: {'stack': [], 'history': []})
-        try:
-            self._load()
-        except FileNotFoundError:
-            self._dump()
-
-    def dump(self):
-        self._dump()
-
-    def _dump(self):
-        with open(self._filename, 'w') as outfile:
-            json.dump(self.data, outfile, indent=4, sort_keys=True)
-
-    def _load(self):
-        with open(self._filename, 'r') as source:
-            for k, v in json.load(source).items():
-                self.data[k] = v
-
-    def _load_if_changed(self):
-        # TODO add change check
-        self._load()
-
-    def get_last_status(self, agent):
-        agent_id = agent.agent_id
-        self._load_if_changed()
-        stack = self.data[agent_id]['stack']
-        if len(stack):
-            last_status = stack[-1]['status']
-        else:
-            last_status = None
-        return last_status
-
-    def add_status(self, agent, status, size=12):
-        if status.lower() in ['available', 'not_available']:
-            agent_id = agent.agent_id
-            self.data[agent_id]['stack'].append(
-                {'status': status,
-                 'dt': datetime.now().strftime(config.DT_FORMAT)
-                 }
-            )
-            add_record(status=status, agent_id=agent_id)
-            self._dump()
-
-
-storage = Storage()
-
-
 class ZendeskAPIGenericClass:
     def __init__(self):
         self._api_url = f"{top_level_url}api/v2/"
@@ -119,28 +64,40 @@ class ZendeskAPIGenericClass:
 
 
 class Agent(ZendeskAPIGenericClass):
-    def __init__(self, agent_id, agent_name):
+    # TODO incapsulate in Agent pony ORM model
+    def __init__(self, model):
         super().__init__()
-        self.agent_id = agent_id
-        self.agent_name = agent_name
+        self.model = model
+        self.agent_id = model.agent_id
+        self.agent_name = model.name
         self.__urls = {
             'talk_availiblity': f"{self._api_url}channels/voice/availabilities/{self.agent_id}.json",
         }
+
+    def get_last_status(self):
+        return self.model.get_last_status()
 
     def get_talk_availability(self):
         data = json.loads(_get(self.__urls['talk_availiblity']))
         return data['availability']
 
     def get_talk_status(self):
-        print(f'Agent: {self.agent_id} - Getting talk status: ', end='')
         avail = self.get_talk_availability()
         status = avail['status']
-        print(status)
         return status
+
+    def save_current_status(self):
+        status = self.get_talk_status()
+        if status.lower() in ['available', 'not_available']:
+            print(f"Saving {status}")
+            agent_id = self.agent_id
+            add_record(status=status, agent_id=agent_id)
+        else:
+            print(f"Status is wrong")
 
     def get_chat_availability(self):
         raise NotImplementedError
         u = self._api.users(id=self.agent_id)
 
 
-agents = [Agent(k, v) for k, v in config.ZENDESK_AGENTS]
+agents = [Agent(a) for a in get_agents()]
