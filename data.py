@@ -61,8 +61,7 @@ def get_agents():
 def add_record(agent_id, status):
     created_at = datetime.now()
     utc = created_at.replace(tzinfo=timezone.utc)
-    # Convert time zone
-    pdt = utc.astimezone(tz=timezone.tzname("America/Los_Angeles"))
+    pdt = utc.astimezone(tz=timezone(timedelta(hours=5)))
     agent = Agent.get(agent_id=agent_id)
     Record(created_at=pdt, status=status, agent=agent)
 
