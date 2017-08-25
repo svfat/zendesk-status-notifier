@@ -77,6 +77,9 @@ class Agent(ZendeskAPIGenericClass):
     def get_last_status(self):
         return self.model.get_last_status()
 
+    def get_week_report(self):
+        return self.model.get_week_report()
+
     def get_talk_availability(self):
         data = json.loads(_get(self.__urls['talk_availiblity']))
         return data['availability']

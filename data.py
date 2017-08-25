@@ -25,6 +25,32 @@ class Agent(db.Entity, GetOrCreateMixin):
     name = Required(str, unique=True)
     records = Set('Record')
 
+    def get_week_report(self, start_dt=None):
+        if not start_dt:
+            start_dt = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        datelist = [start_dt-timedelta(days=x) for x in range(0, 7)]
+        result = {date: self.get_total_on_date(date) for date in datelist}
+        return result
+
+    def get_total_on_date(self, date):
+        AVAILABLE = 'available'
+        NOT_AVAILABLE = 'not_available'
+        last_status = NOT_AVAILABLE
+        start = None
+        date = date.replace(hour=0, minute=0, second=0, microsecond=0)
+        total = timedelta()
+        with db_session():
+            for record in self.records.select(lambda x: x.created_at >= date and x.created_at < date + timedelta(days=1)):
+                if record.status == AVAILABLE and last_status != AVAILABLE:
+                    # start timedelta
+                    start = record.created_at
+                elif record.status == NOT_AVAILABLE and last_status == AVAILABLE:
+                    # end timedelta
+                    total += record.created_at - start
+                    start = None
+                last_status = record.status
+        return total
+
     def get_last_status(self):
         with db_session():
             records = list(self.records.order_by(lambda x: x.id))

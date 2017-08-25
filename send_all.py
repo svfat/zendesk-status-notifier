@@ -3,6 +3,7 @@
 import requests
 
 from utils import calculate_available_time
+from datetime import timedelta
 
 import logging
 logging.basicConfig(filename="sender.log", level=logging.DEBUG)
@@ -20,13 +21,14 @@ class Sender():
     def __init__(self):
         pass
 
-    def _send(self, subject, text, html):
+    def _send(self, subject, text, html=None):
         data = {"from": config.MAILGUN_EMAIL,
                 "to": config.EMAIL_ADDR,
                 "cc": config.MAILGUN_CC_LIST,
                 "subject": subject,
-                "text": text,
-                "html": html}
+                "text": text,}
+        if html:
+            data['html'] = html
         logging.debug(f'Sending email {data} via {config.MAILGUN_API_HOST}')
         response = requests.post(
             f'https://api.mailgun.net/v3/{config.MAILGUN_API_HOST}/messages',
@@ -115,6 +117,25 @@ class Sender():
         subject = f"ZD {agent_name} TALK STATUS REPORT"
         self._send(subject, plaintext, html)
 
+    def send_total_status(self, agents):
+        """
+        Is there anyway to send ONE email summarizing all reps that show TALK time that day,
+         into one email, with their name and talk time that day?
+        3. Is there anyway to include the previous 7 days worth of totals in the one summary email?
+        For example: TODAY - XX:XX Hours - YESTERDAY - XX:XX Hours, etc...
+        """
+        data = {agent.agent_name: agent.get_week_report() for agent in agents}
+        plain_line_tpl = "{} - {} Hours"
+        plaintext_data = []
+        for name, report in data.items():
+            plaintext_data.append(name)
+            for date, total in report.items():
+                total = total - timedelta(microseconds=total.microseconds)
+                plaintext_data.append(plain_line_tpl.format(date.strftime("%Y-%m-%d %A"), total))
+            plaintext_data.append("\n")
+        plaintext = '\n'.join(plaintext_data)
+        print(plaintext)
+        self._send("Report for last 7 days", plaintext)
 
 if __name__ == "__main__":
     default_sender = Sender()
@@ -123,4 +144,6 @@ if __name__ == "__main__":
     for agent in agents:
         agent_id = agent.agent_id
         stack = db_data[agent_id]
-        default_sender.send_talk_status(agent_id=agent_id, agent_name=agent.agent_name, stack=stack)
+        #default_sender.send_talk_status(agent_id=agent_id, agent_name=agent.agent_name, stack=stack)
+    default_sender.send_total_status(agents)
+
