@@ -106,7 +106,8 @@ def get_last_status(agent_id):
 def get_records_on_dt_range(start_dt=None, end_dt=None):
     if not start_dt:
         yesterday = datetime.now() - timedelta(days=1)
-        start_dt = yesterday.replace(hour=17, minute=0, second=0, microsecond=0)
+        start_dt = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)+timedelta(hours=7)
+        print('start_dt', start_dt)
     if not end_dt:
         end_dt = start_dt + timedelta(hours=24)
     data = Record.select(lambda x: x.created_at >= start_dt and x.created_at <= end_dt) \
@@ -128,6 +129,4 @@ def get_records_on_dt_range(start_dt=None, end_dt=None):
 def convert_tz():
     records = Record.select()
     for record in records:
-        utc = record.created_at.replace(tzinfo=timezone.utc)
-        pdt = utc.astimezone(tz=timezone(timedelta(hours=5)))
-        record.created_at = pdt
+        record.created_at.replace(tzinfo=None)
