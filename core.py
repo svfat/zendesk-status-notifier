@@ -87,6 +87,8 @@ class Agent(ZendeskAPIGenericClass):
     def get_talk_status(self):
         avail = self.get_talk_availability()
         status = avail['status']
+        if status == 'on_call':
+            status = 'available'
         return status
 
     def save_current_status(self):
