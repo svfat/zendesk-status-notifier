@@ -37,7 +37,6 @@ class Agent(db.Entity, GetOrCreateMixin):
         NOT_AVAILABLE = 'not_available'
         last_status = NOT_AVAILABLE
         start = None
-        date = date.replace(hour=0, minute=0, second=0, microsecond=0)-timedelta(hours=7)
         total = timedelta()
         with db_session():
             for record in self.records.select(lambda x: x.created_at >= date and x.created_at < date + timedelta(days=1)):
@@ -49,6 +48,7 @@ class Agent(db.Entity, GetOrCreateMixin):
                     total += record.created_at - start
                     start = None
                 last_status = record.status
+        print(f"{self.agent_id}: Total on date {date} - {total}")
         return total
 
     def get_last_status(self):
