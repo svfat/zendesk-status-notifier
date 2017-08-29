@@ -86,8 +86,11 @@ def get_agents():
 @db_session
 def add_record(agent_id, status):
     created_at = datetime.now()
+    print(f"Datetime now {created_at}")
     utc = created_at.replace(tzinfo=timezone.utc)
+    print(f"Datetime utc {utc}")
     pdt = utc.astimezone(tz=timezone(timedelta(hours=5)))
+    print(f"Datetime pdt {pdt}")
     agent = Agent.get(agent_id=agent_id)
     Record(created_at=pdt, status=status, agent=agent)
 
