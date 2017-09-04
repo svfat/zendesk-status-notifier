@@ -124,14 +124,25 @@ class Sender():
         3. Is there anyway to include the previous 7 days worth of totals in the one summary email?
         For example: TODAY - XX:XX Hours - YESTERDAY - XX:XX Hours, etc...
         """
-        data = {agent.agent_name: agent.get_week_report() for agent in agents}
+
         plain_line_tpl = "{} - {} Hours"
+        line_tpl = "Id: {}, Name: {} TALK {} {}"
         plaintext_data = []
-        for name, report in data.items():
-            plaintext_data.append(name)
-            for date, total in report.items():
+        for agent in agents:
+            plaintext_data.append(agent.agent_name)
+            for date, total in agent.get_week_report().items():
                 total = total - timedelta(microseconds=total.microseconds)
                 plaintext_data.append(plain_line_tpl.format(date.strftime("%Y-%m-%d %A"), total))
+            plaintext_data.append("\n")
+            plaintext_data.append("Day status")
+            day_report = agent.get_day_report()
+            if day_report:
+                for status, datetime in agent.get_day_report():
+                    dt = datetime.strftime(DT_FORMAT)
+                    plaintext_data.append(line_tpl.format(agent.agent_id, agent.agent_name, status.upper(), dt))
+                plaintext_data.append("Total available: {}".format(total))
+            else:
+                plaintext_data.append('-- NO RECORDS --')
             plaintext_data.append("\n")
         plaintext = '\n'.join(plaintext_data)
         print(plaintext)

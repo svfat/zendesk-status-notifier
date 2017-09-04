@@ -25,11 +25,21 @@ class Agent(db.Entity, GetOrCreateMixin):
     name = Required(str, unique=True)
     records = Set('Record')
 
+    @db_session
+    def records_for_date(self, dt):
+        return list(self.records.select(lambda x: x.created_at >= dt and x.created_at < dt + timedelta(days=1)))
+
     def get_week_report(self, start_dt=None):
         if not start_dt:
             start_dt = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)-timedelta(hours=7)
         datelist = [start_dt-timedelta(days=x) for x in range(0, 7)]
         result = {date: self.get_total_on_date(date) for date in datelist}
+        return result
+
+    def get_day_report(self, dt=None):
+        if not dt:
+            dt = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)-timedelta(hours=7)
+        result = [(r.status, r.created_at-timedelta(hours=7)) for r in self.records_for_date(dt)]
         return result
 
     def get_total_on_date(self, date):

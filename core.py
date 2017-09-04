@@ -74,6 +74,9 @@ class Agent(ZendeskAPIGenericClass):
             'talk_availiblity': f"{self._api_url}channels/voice/availabilities/{self.agent_id}.json",
         }
 
+    def get_day_report(self):
+        return self.model.get_day_report()
+
     def get_last_status(self):
         return self.model.get_last_status()
 
