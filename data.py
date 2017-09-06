@@ -38,8 +38,8 @@ class Agent(db.Entity, GetOrCreateMixin):
 
     def get_day_report(self, dt=None):
         if not dt:
-            dt = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)-timedelta(hours=12)
-        result = [(r.status, r.created_at-timedelta(hours=7)) for r in self.records_for_date(dt)]
+            dt = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)-timedelta(hours=7)
+        result = [(r.status, r.created_at-timedelta(hours=12)) for r in self.records_for_date(dt)]
         return result
 
     def get_total_on_date(self, date):
