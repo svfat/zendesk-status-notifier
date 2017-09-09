@@ -125,7 +125,7 @@ class Sender():
         For example: TODAY - XX:XX Hours - YESTERDAY - XX:XX Hours, etc...
         """
 
-        plain_line_tpl = "{} - {} Hours"
+        plain_line_tpl = "{}\t{} Hours"
         line_tpl = "Id: {}, Name: {} TALK {} {}"
         plaintext_data = []
         for agent in agents:
