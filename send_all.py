@@ -126,7 +126,7 @@ class Sender():
         """
 
         plain_line_tpl = "{}\t{} Hours"
-        line_tpl = "Id: {}\tName: {}\tTALK\t{}\t{}"
+        line_tpl = "Id: {}\tName: {}\tTALK\t{}\t\t{}"
         plaintext_data = []
         for agent in agents:
             plaintext_data.append(agent.agent_name)
