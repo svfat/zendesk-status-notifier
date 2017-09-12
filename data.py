@@ -40,7 +40,7 @@ class Agent(db.Entity, GetOrCreateMixin):
         if not dt:
             dt = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)-timedelta(hours=7)
         result = [(r.status, r.created_at-timedelta(hours=12)) for r in self.records_for_date(dt)]
-        return result
+        return result, self.get_total_on_date(dt)
 
     def get_total_on_date(self, date):
         AVAILABLE = 'available'
@@ -58,7 +58,7 @@ class Agent(db.Entity, GetOrCreateMixin):
                     total += record.created_at - start
                     start = None
                 last_status = record.status
-        print(f"{self.agent_id}: Total on date {date} - {total}")
+        print(f"{self.name}: Total on date {date} - {total}")
         return total
 
     def get_last_status(self):
