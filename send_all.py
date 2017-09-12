@@ -131,8 +131,8 @@ class Sender():
                 return s
         plain_total_tpl = "{}\t{} Hours"
         plain_line_tpl = "Id: {}\tName: {}\tTALK\t{}\t{}"
-        html_total_tpl = "<tr><td>{}</td><td>{}</td></tr>"
-        html_line_tpl = "<tr><td>{}</td><td>{}</td></tr>"
+        html_total_tpl = '<tr style="color: {}"><td>{}</td><td>{}</td></tr>'
+        html_line_tpl = '<tr ><td>{}</td><td>{}</td></tr>'
         html_data = ["""<!DOCTYPE html>
                         <html>
                         <body>
@@ -144,11 +144,15 @@ class Sender():
             plaintext_data.append(agent.agent_name)
             html_data.append('<h2>{}</h2>'.format(agent.agent_name))
             html_data.append('<p>Id: {}</p>'.format(agent.agent_id))
-            html_data.append('<table cellpadding="3" border="1" style="border-collapse: collapse;">')
+            html_data.append('<table cellpadding="5" border="1" style="border-collapse: collapse;">')
             for date, total in agent.get_week_report().items():
                 total = total - timedelta(microseconds=total.microseconds)
+                if total.total_seconds() <= 0:
+                    color = "#d0d0d0"
+                else:
+                    color = "#000000"
                 plaintext_data.append(plain_total_tpl.format(date.strftime("%Y-%m-%d %A"), total))
-                html_data.append(html_total_tpl.format(date.strftime("%Y-%m-%d %A"), total))
+                html_data.append(html_total_tpl.format(color, date.strftime("%Y-%m-%d %A"), total))
             plaintext_data.append("\n")
             plaintext_data.append("Day status")
             html_data.append("</table><h4>Day status</h4>")
@@ -156,7 +160,7 @@ class Sender():
 
             if day_report:
 
-                html_data.append('<table cellpadding="3" border="1" style="border-collapse: collapse;">')
+                html_data.append('<table cellpadding="5" border="1" style="border-collapse: collapse;">')
                 for status, datetime in day_report:
                     dt = datetime.strftime(DT_FORMAT)
                     plaintext_data.append(plain_line_tpl.format(agent.agent_id,
