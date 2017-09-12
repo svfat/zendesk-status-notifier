@@ -131,25 +131,29 @@ class Sender():
                 return s
         plain_total_tpl = "{}\t{} Hours"
         plain_line_tpl = "Id: {}\tName: {}\tTALK\t{}\t{}"
-        html_total_tpl = "<p>{}\t{} Hours</p>"
-        html_line_tpl = "<tr><td>{}</td>{}<td>{}</td><td>{}</td></tr>"
+        html_total_tpl = "<tr><td>{}</td><td>{}</td></tr>"
+        html_line_tpl = "<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>"
         html_data = ["""<!DOCTYPE html>
                         <html>
-                        <body>""",
+                        <body>
+                        <h1>Report</h1>
+                        """,
                      ]
         plaintext_data = []
         for agent in agents:
             plaintext_data.append(agent.agent_name)
+            html_data.append('<h2>{}</h2>'.format(agent.agent_name))
+            html_data.append('<table width="70%" border="1">')
             for date, total in agent.get_week_report().items():
                 total = total - timedelta(microseconds=total.microseconds)
                 plaintext_data.append(plain_total_tpl.format(date.strftime("%Y-%m-%d %A"), total))
                 html_data.append(html_total_tpl.format(date.strftime("%Y-%m-%d %A"), total))
             plaintext_data.append("\n")
             plaintext_data.append("Day status")
-            html_data.append("<h2>Day status</h2>")
+            html_data.append("</table><h4>Day status</h4>")
             day_report, total_day = agent.get_day_report()
             if day_report:
-                html_data.append('<table>')
+                html_data.append('<table  width="70%" border="1">')
                 for status, datetime in day_report:
                     dt = datetime.strftime(DT_FORMAT)
                     plaintext_data.append(plain_line_tpl.format(agent.agent_id,
@@ -162,7 +166,7 @@ class Sender():
                                                           dt))
                 html_data.append('</table>')
                 plaintext_data.append("Total available: {}".format(total_day))
-                html_data.append("<p>Total available: {}</p>".format(total_day))
+                html_data.append("<p>Total available: <strong>{}</strong></p>".format(total_day))
             else:
                 plaintext_data.append('-- NO RECORDS --')
                 html_data.append("<p>-- NO RECORDS --</p>")
@@ -171,6 +175,8 @@ class Sender():
         plaintext = '\n'.join(plaintext_data)
         html = '\n'.join(html_data)
         print(html)
+        with open("email.html", "w") as f:
+            f.write(html)
         self._send("Report for last 7 days", plaintext, html)
 
 if __name__ == "__main__":
