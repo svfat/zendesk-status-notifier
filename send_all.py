@@ -149,6 +149,7 @@ class Sender():
             html_data.append("<h2>Day status</h2>")
             day_report, total_day = agent.get_day_report()
             if day_report:
+                html_data.append('<table>')
                 for status, datetime in day_report:
                     dt = datetime.strftime(DT_FORMAT)
                     plaintext_data.append(plain_line_tpl.format(agent.agent_id,
@@ -159,6 +160,7 @@ class Sender():
                                                           agent.agent_name,
                                                           adjust_length(status.upper(), len('AVAILABLE')),
                                                           dt))
+                html_data.append('</table>')
                 plaintext_data.append("Total available: {}".format(total_day))
                 html_data.append("<p>Total available: {}</p>".format(total_day))
             else:
