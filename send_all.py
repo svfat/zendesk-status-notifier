@@ -171,7 +171,7 @@ class Sender():
                                                           dt))
                 html_data.append('</table>')
                 plaintext_data.append("Total available: {}".format(total_day))
-                html_data.append("<p>Total available: <strong>{}</strong></p>".format(total_day))
+                html_data.append("<p>Total available: <strong>{}</strong></p>".format(str(total_day).split(".")[0]))
             else:
                 plaintext_data.append('-- NO RECORDS --')
                 html_data.append("<p>-- NO RECORDS --</p>")
