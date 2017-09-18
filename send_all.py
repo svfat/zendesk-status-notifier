@@ -144,6 +144,7 @@ class Sender():
             plaintext_data.append(agent.agent_name)
             html_data.append('<h2>{}</h2>'.format(agent.agent_name))
             html_data.append('<p>Id: {}</p>'.format(agent.agent_id))
+            html_data.append('<table><tr><td>') # external table
             html_data.append('<table cellpadding="5" border="1" style="border-collapse: collapse;">')
             for date, total in agent.get_week_report().items():
                 total = total - timedelta(microseconds=total.microseconds)
@@ -156,6 +157,7 @@ class Sender():
             plaintext_data.append("\n")
             plaintext_data.append("Day status")
             html_data.append("</table><h4>Day status</h4>")
+            html_data.append("</td><td>") # second column
             day_report, total_day = agent.get_day_report()
 
             if day_report:
@@ -176,6 +178,7 @@ class Sender():
                 plaintext_data.append('-- NO RECORDS --')
                 html_data.append("<p>-- NO RECORDS --</p>")
             plaintext_data.append("\n")
+            html_data.append('</td></tr></table>')
             html_data.append('<hr \>')
         html_data.append("</body></html>")
         plaintext = '\n'.join(plaintext_data)
