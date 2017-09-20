@@ -102,8 +102,8 @@ def add_record(agent_id, status):
     pdt = utc.astimezone(tz=timezone(timedelta(hours=5)))
     print(f"Datetime pdt {pdt}")
     agent = Agent.get(agent_id=agent_id)
-    Record(created_at=pdt, status=status, agent=agent)
-
+    record = Record(created_at=pdt, status=status, agent=agent)
+    return record
 
 @db_session
 def get_last_status(agent_id):

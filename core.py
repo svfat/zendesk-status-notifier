@@ -96,12 +96,14 @@ class Agent(ZendeskAPIGenericClass):
 
     def save_current_status(self):
         status = self.get_talk_status()
+        record = None
         if status.lower() in ['available', 'not_available']:
             print(f"Saving {status}")
             agent_id = self.agent_id
-            add_record(status=status, agent_id=agent_id)
+            record = add_record(status=status, agent_id=agent_id)
         else:
             print(f"Status is wrong")
+        return record
 
     def get_chat_availability(self):
         raise NotImplementedError
