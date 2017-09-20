@@ -4,7 +4,7 @@ default_sender = Sender()
 
 
 def send_one(record):
-    name = record.agent.agent_name
+    name = record.agent.name
     status = record.status
     created_at = record.created_at.strftime(DT_FORMAT)
     template = "{} status changed to: {} at {}"
