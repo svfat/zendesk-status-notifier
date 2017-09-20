@@ -10,7 +10,10 @@ for agent in agents:
     print(f'agent: {agent.agent_name}, status: {current_status}, last status: {last_status}')
     if current_status != last_status or DEBUG_SEND_ALL:
         record = agent.save_current_status()
-        send_one(record)
+        if record:
+            send_one(record)
+        else:
+            print(f"Status changed to {current_status}. We don't track it")
     else:
         print(f"Stasus doesn't changed")
 # print(agent.get_chat_availability())2
